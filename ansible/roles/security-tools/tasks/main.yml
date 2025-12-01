@@ -1,0 +1,180 @@
+# Security Tools Role - Threat Hunting & Forensics
+#
+# Installs a comprehensive toolkit for security research,
+# malware analysis, and incident response.
+
+---
+# ===========================================
+# Network Analysis & Packet Capture
+# ===========================================
+- name: Install network analysis tools
+  apt:
+    name:
+      - wireshark
+      - tshark
+      - tcpdump
+      - nmap
+      - netcat-openbsd
+      - masscan
+      - hping3
+      - arpwatch
+      - ettercap-text-only
+    state: present
+
+- name: Allow non-root packet capture (wireshark)
+  debconf:
+    name: wireshark-common
+    question: wireshark-common/install-setuid
+    value: "true"
+    vtype: boolean
+  notify: reconfigure wireshark
+
+# ===========================================
+# Forensics & Disk Analysis
+# ===========================================
+- name: Install forensics tools
+  apt:
+    name:
+      - sleuthkit           # File system forensics
+      - autopsy             # GUI for sleuthkit
+      - foremost            # File carving
+      - binwalk             # Firmware analysis
+      - testdisk            # Data recovery
+      - photorec            # Photo recovery
+      - dcfldd              # Forensic dd
+      - hash-identifier     # Hash type identification
+      - xxd                 # Hex dump
+      - hexedit             # Hex editor
+    state: present
+
+# ===========================================
+# Malware Analysis & Reverse Engineering
+# ===========================================
+- name: Install reverse engineering tools
+  apt:
+    name:
+      - radare2             # RE framework
+      - gdb                 # Debugger
+      - gdb-multiarch       # Cross-arch debugging
+      - binutils            # objdump, readelf, etc.
+      - nasm                # Assembler
+      - upx-ucl             # Unpacker
+      - yara                # Pattern matching
+    state: present
+
+- name: Install Python RE/malware analysis libraries
+  pip:
+    name:
+      - pefile              # PE file parsing
+      - yara-python         # YARA Python bindings
+      - capstone            # Disassembly framework
+      - unicorn             # CPU emulator
+      - keystone-engine     # Assembler framework
+      - ropper              # ROP gadget finder
+    state: present
+    executable: pip3
+
+# ===========================================
+# OSINT & Reconnaissance
+# ===========================================
+- name: Install OSINT tools
+  apt:
+    name:
+      - whois
+      - dnsrecon
+      - dnsenum
+      - fierce
+      - recon-ng
+      - maltego            # May not be in repos
+    state: present
+  ignore_errors: yes  # Some may not be available
+
+- name: Install theHarvester
+  pip:
+    name: theHarvester
+    state: present
+    executable: pip3
+  ignore_errors: yes
+
+# ===========================================
+# Web Application Security
+# ===========================================
+- name: Install web security tools
+  apt:
+    name:
+      - nikto               # Web scanner
+      - dirb                # Directory brute forcer
+      - gobuster            # Directory/DNS brute forcer
+      - sqlmap              # SQL injection
+      - wfuzz               # Web fuzzer
+    state: present
+  ignore_errors: yes
+
+# ===========================================
+# Password & Cryptography
+# ===========================================
+- name: Install password/crypto tools
+  apt:
+    name:
+      - john                # John the Ripper
+      - hashcat             # GPU hash cracking
+      - hydra               # Network login cracker
+      - ophcrack            # Windows password cracker
+      - hash-identifier
+      - openssl
+    state: present
+  ignore_errors: yes
+
+# ===========================================
+# Log Analysis & SIEM
+# ===========================================
+- name: Install log analysis tools
+  apt:
+    name:
+      - logwatch
+      - goaccess            # Web log analyzer
+      - multitail           # Multi-file tail
+    state: present
+
+# ===========================================
+# Memory Forensics
+# ===========================================
+- name: Install Volatility 3 dependencies
+  apt:
+    name:
+      - python3-pefile
+      - python3-yara
+      - python3-capstone
+    state: present
+
+- name: Install Volatility 3
+  pip:
+    name: volatility3
+    state: present
+    executable: pip3
+  ignore_errors: yes
+
+# ===========================================
+# Container Security
+# ===========================================
+- name: Install container security tools
+  apt:
+    name:
+      - docker.io
+      - docker-compose
+    state: present
+
+- name: Install trivy (container scanner) GPG key
+  shell: |
+    curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+  args:
+    creates: /usr/share/keyrings/trivy.gpg
+  ignore_errors: yes
+
+# ===========================================
+# Handlers
+# ===========================================
+handlers:
+  - name: reconfigure wireshark
+    command: dpkg-reconfigure -f noninteractive wireshark-common
+

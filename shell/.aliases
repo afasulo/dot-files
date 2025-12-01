@@ -1,0 +1,186 @@
+# ~/.aliases - Command shortcuts for security research & development
+# Author: Adam Fasulo
+
+# ===========================================
+# Navigation & File Operations
+# ===========================================
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
+alias ls='ls --color=auto'
+alias ll='ls -alFh'
+alias la='ls -A'
+alias l='ls -CF'
+alias lt='ls -ltrh'          # Sort by time, newest last
+alias lS='ls -lSrh'          # Sort by size
+
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -iv'
+alias mkdir='mkdir -pv'
+
+# ===========================================
+# Grep & Search
+# ===========================================
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias rg='rg --smart-case'
+
+# ===========================================
+# System Monitoring
+# ===========================================
+alias df='df -h'
+alias du='du -h'
+alias free='free -h'
+alias top='htop'
+alias psmem='ps auxf | sort -nr -k 4 | head -10'
+alias pscpu='ps auxf | sort -nr -k 3 | head -10'
+
+# ===========================================
+# Network
+# ===========================================
+alias ip='ip -c'
+alias myip='curl -s ifconfig.me && echo'
+alias localip="ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1"
+alias listening='sudo lsof -i -P -n | grep LISTEN'
+alias connections='sudo netstat -tunapl'
+
+# ===========================================
+# Security Tools - Quick Access
+# ===========================================
+# Network scanning
+alias nmap-quick='nmap -sV -sC -O -T4'
+alias nmap-full='nmap -sV -sC -O -T4 -p-'
+alias nmap-udp='sudo nmap -sU -T4'
+alias nmap-vuln='nmap --script vuln'
+
+# Packet capture
+alias tcpdump-brief='sudo tcpdump -i any -n -c 100'
+alias tcpdump-http='sudo tcpdump -i any -n port 80 or port 443'
+alias tcpdump-dns='sudo tcpdump -i any -n port 53'
+
+# Traffic analysis
+alias tshark-stats='tshark -q -z io,stat,1'
+alias tshark-http='tshark -Y "http.request" -T fields -e http.host -e http.request.uri'
+
+# ===========================================
+# Reverse Engineering
+# ===========================================
+alias objdump='objdump -M intel'
+alias disasm='objdump -d -M intel'
+alias symbols='nm -C'
+alias sections='readelf -S'
+alias headers='readelf -h'
+alias strings-all='strings -a -t x'
+
+# Radare2 shortcuts
+alias r2='radare2'
+alias r2-analyze='radare2 -A'
+
+# ===========================================
+# Forensics
+# ===========================================
+alias binwalk-extract='binwalk -e'
+alias file-magic='file -b'
+alias md5='md5sum'
+alias sha1='sha1sum'
+alias sha256='sha256sum'
+
+# Volatility
+alias vol='volatility3'
+alias vol-info='volatility3 -f'
+
+# ===========================================
+# Development & Debugging
+# ===========================================
+alias make='make -j$(nproc)'
+alias cmake-debug='cmake -DCMAKE_BUILD_TYPE=Debug'
+alias cmake-release='cmake -DCMAKE_BUILD_TYPE=Release'
+
+alias gdb='gdb -q'
+alias gdb-tui='gdb -q -tui'
+alias valgrind-full='valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes'
+alias valgrind-quick='valgrind --leak-check=summary'
+
+alias strace-summary='strace -c'
+alias strace-file='strace -e trace=file'
+alias strace-network='strace -e trace=network'
+
+# ===========================================
+# Git
+# ===========================================
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git log --oneline -20'
+alias gd='git diff'
+alias gco='git checkout'
+alias gb='git branch'
+alias gpull='git pull'
+
+# ===========================================
+# Docker
+# ===========================================
+alias dk='docker'
+alias dkps='docker ps'
+alias dkpsa='docker ps -a'
+alias dki='docker images'
+alias dkrm='docker rm'
+alias dkrmi='docker rmi'
+alias dkexec='docker exec -it'
+alias dklogs='docker logs -f'
+alias dkprune='docker system prune -af'
+
+# ===========================================
+# Tmux
+# ===========================================
+alias ta='tmux attach -t'
+alias tl='tmux list-sessions'
+alias tn='tmux new-session -s'
+alias tk='tmux kill-session -t'
+
+# ===========================================
+# Safety Nets
+# ===========================================
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+
+# ===========================================
+# Misc Utilities
+# ===========================================
+alias cls='clear'
+alias h='history'
+alias j='jobs -l'
+alias now='date +"%Y-%m-%d %H:%M:%S"'
+alias week='date +%V'
+alias path='echo -e ${PATH//:/\\n}'
+alias reload='source ~/.bashrc'
+
+# Weather (fun)
+alias weather='curl wttr.in'
+
+# ===========================================
+# Custom Security Commands
+# ===========================================
+# Check for SUID binaries
+alias suid-find='find / -perm -4000 -type f 2>/dev/null'
+
+# Check for world-writable files
+alias world-writable='find / -perm -002 -type f 2>/dev/null'
+
+# Quick hash file
+alias hashfile='sha256sum'
+
+# List kernel modules
+alias lsmod-sorted='lsmod | sort'
+
+# Check for rootkits (basic)
+alias check-hidden='ls -la /proc | grep -E "^d.*[0-9]+" | wc -l; ps aux | wc -l'
+

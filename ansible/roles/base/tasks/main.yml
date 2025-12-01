@@ -1,0 +1,65 @@
+# Base Role - Core System Utilities
+#
+# Installs essential packages needed for any development environment.
+
+---
+- name: Install essential packages
+  apt:
+    name:
+      - build-essential
+      - git
+      - curl
+      - wget
+      - htop
+      - tree
+      - unzip
+      - zip
+      - jq
+      - vim
+      - tmux
+      - screen
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - software-properties-common
+    state: present
+
+- name: Install network utilities
+  apt:
+    name:
+      - net-tools
+      - dnsutils
+      - iputils-ping
+      - traceroute
+      - whois
+      - openssh-client
+      - openssh-server
+    state: present
+
+- name: Install system monitoring tools
+  apt:
+    name:
+      - sysstat
+      - iotop
+      - iftop
+      - nethogs
+      - lsof
+      - strace
+      - ltrace
+    state: present
+
+- name: Install Python essentials
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+      - python3-dev
+    state: present
+
+- name: Ensure SSH service is running
+  service:
+    name: ssh
+    state: started
+    enabled: yes
+

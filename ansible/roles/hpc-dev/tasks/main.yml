@@ -1,0 +1,155 @@
+# HPC Development Role
+#
+# Installs tools for high-performance computing and systems development.
+# Optimized for kernel development, performance analysis, and debugging.
+
+---
+# ===========================================
+# Compilers & Build Tools
+# ===========================================
+- name: Install compilers and build essentials
+  apt:
+    name:
+      - build-essential
+      - gcc
+      - g++
+      - clang
+      - llvm
+      - make
+      - cmake
+      - autoconf
+      - automake
+      - libtool
+      - pkg-config
+      - ninja-build
+    state: present
+
+- name: Install additional compiler tools
+  apt:
+    name:
+      - ccache              # Compiler cache
+      - distcc              # Distributed compilation
+      - bear                # Compilation database generator
+    state: present
+
+# ===========================================
+# Kernel Development
+# ===========================================
+- name: Install kernel development packages
+  apt:
+    name:
+      - linux-headers-generic
+      - linux-tools-generic
+      - linux-tools-common
+      - libelf-dev
+      - libssl-dev
+      - flex
+      - bison
+      - dwarves             # pahole for BTF
+    state: present
+
+- name: Install BPF/eBPF tools
+  apt:
+    name:
+      - bpfcc-tools
+      - bpftrace
+      - libbpf-dev
+    state: present
+  ignore_errors: yes  # May not be available on older systems
+
+# ===========================================
+# Debugging & Profiling
+# ===========================================
+- name: Install debugging tools
+  apt:
+    name:
+      - gdb
+      - gdbserver
+      - lldb
+      - valgrind
+      - strace
+      - ltrace
+      - binutils
+      - elfutils
+    state: present
+
+- name: Install profiling tools
+  apt:
+    name:
+      - linux-tools-generic  # perf
+      - oprofile
+      - google-perftools
+      - libgoogle-perftools-dev
+      - heaptrack
+      - hotspot             # Perf GUI (if available)
+    state: present
+  ignore_errors: yes
+
+- name: Install GDB enhancements (pwndbg)
+  git:
+    repo: https://github.com/pwndbg/pwndbg.git
+    dest: "{{ user_home }}/.pwndbg"
+    depth: 1
+  become: no
+  ignore_errors: yes
+
+- name: Install GDB enhancements (GEF)
+  get_url:
+    url: https://raw.githubusercontent.com/hugsy/gef/main/gef.py
+    dest: "{{ user_home }}/.gef.py"
+    mode: '0644'
+  become: no
+  ignore_errors: yes
+
+# ===========================================
+# Libraries
+# ===========================================
+- name: Install development libraries
+  apt:
+    name:
+      - libpthread-stubs0-dev
+      - libc6-dev
+      - libncurses-dev
+      - libreadline-dev
+      - zlib1g-dev
+      - libffi-dev
+    state: present
+
+# ===========================================
+# Performance Analysis
+# ===========================================
+- name: Install performance analysis tools
+  apt:
+    name:
+      - sysstat             # sar, iostat
+      - dstat
+      - numactl
+      - hwloc
+      - likwid              # HPC performance tools
+    state: present
+  ignore_errors: yes
+
+# ===========================================
+# Documentation
+# ===========================================
+- name: Install documentation tools
+  apt:
+    name:
+      - doxygen
+      - graphviz
+      - manpages-dev
+      - manpages-posix-dev
+    state: present
+
+# ===========================================
+# Version Control
+# ===========================================
+- name: Install version control tools
+  apt:
+    name:
+      - git
+      - git-lfs
+      - tig                 # Git TUI
+      - gitk
+    state: present
+

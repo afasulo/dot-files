@@ -1,0 +1,130 @@
+# Dotfiles Role
+#
+# Deploys shell, editor, and terminal configurations.
+# Creates symlinks from the repo to home directory.
+
+---
+- name: Get actual user (not root from become)
+  set_fact:
+    actual_user: "{{ ansible_env.SUDO_USER | default(ansible_env.USER) }}"
+    actual_home: "{{ ansible_env.HOME }}"
+
+- name: Create config directories
+  file:
+    path: "{{ actual_home }}/{{ item }}"
+    state: directory
+    owner: "{{ actual_user }}"
+    mode: '0755'
+  loop:
+    - .config
+    - .local/bin
+  become: no
+
+# ===========================================
+# Shell Configuration
+# ===========================================
+- name: Deploy .bashrc
+  copy:
+    src: "{{ dotfiles_repo }}/shell/.bashrc"
+    dest: "{{ actual_home }}/.bashrc"
+    owner: "{{ actual_user }}"
+    mode: '0644'
+    backup: yes
+  become: no
+
+- name: Deploy .aliases
+  copy:
+    src: "{{ dotfiles_repo }}/shell/.aliases"
+    dest: "{{ actual_home }}/.aliases"
+    owner: "{{ actual_user }}"
+    mode: '0644'
+  become: no
+
+# ===========================================
+# Editor Configuration
+# ===========================================
+- name: Deploy .vimrc
+  copy:
+    src: "{{ dotfiles_repo }}/editor/.vimrc"
+    dest: "{{ actual_home }}/.vimrc"
+    owner: "{{ actual_user }}"
+    mode: '0644'
+    backup: yes
+  become: no
+
+- name: Deploy .gdbinit
+  copy:
+    src: "{{ dotfiles_repo }}/editor/.gdbinit"
+    dest: "{{ actual_home }}/.gdbinit"
+    owner: "{{ actual_user }}"
+    mode: '0644'
+    backup: yes
+  become: no
+
+# ===========================================
+# Tmux Configuration
+# ===========================================
+- name: Deploy .tmux.conf
+  copy:
+    src: "{{ dotfiles_repo }}/tmux/.tmux.conf"
+    dest: "{{ actual_home }}/.tmux.conf"
+    owner: "{{ actual_user }}"
+    mode: '0644'
+    backup: yes
+  become: no
+
+# ===========================================
+# Git Configuration
+# ===========================================
+- name: Configure git (if not already configured)
+  git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop:
+    - { name: 'core.editor', value: 'vim' }
+    - { name: 'init.defaultBranch', value: 'main' }
+    - { name: 'color.ui', value: 'auto' }
+    - { name: 'pull.rebase', value: 'false' }
+  become: no
+  ignore_errors: yes
+
+# ===========================================
+# Create convenience scripts
+# ===========================================
+- name: Create security tools check script
+  copy:
+    content: |
+      #!/bin/bash
+      # sec-check: Verify security tools installation
+      
+      echo "=== Security Tools Status ==="
+      echo ""
+      
+      tools=(
+        "nmap:Network scanner"
+        "wireshark:Packet analyzer"
+        "tcpdump:Packet capture"
+        "gdb:Debugger"
+        "radare2:RE framework"
+        "yara:Pattern matching"
+        "volatility3:Memory forensics"
+        "binwalk:Firmware analysis"
+        "john:Password cracker"
+        "sqlmap:SQL injection"
+      )
+      
+      for tool_info in "${tools[@]}"; do
+        tool="${tool_info%%:*}"
+        desc="${tool_info##*:}"
+        if command -v "$tool" &> /dev/null; then
+          echo "✅ $tool - $desc"
+        else
+          echo "❌ $tool - $desc (not installed)"
+        fi
+      done
+    dest: "{{ actual_home }}/.local/bin/sec-check"
+    owner: "{{ actual_user }}"
+    mode: '0755'
+  become: no
+

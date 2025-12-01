@@ -1,0 +1,26 @@
+# Ansible Inventory
+# 
+# For local workstation setup, use localhost
+# Add remote hosts as needed for lab environments
+
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+  
+  children:
+    workstations:
+      hosts:
+        localhost:
+    
+    # Example: Add lab VMs for security research
+    # lab_vms:
+    #   hosts:
+    #     malware-analysis-vm:
+    #       ansible_host: 192.168.122.10
+    #       ansible_user: analyst
+    #     forensics-vm:
+    #       ansible_host: 192.168.122.11
+    #       ansible_user: analyst
+

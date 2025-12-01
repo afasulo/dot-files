@@ -1,0 +1,61 @@
+# Main Ansible Playbook
+# 
+# Provisions a complete security research and HPC development environment.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml playbook.yml              # Full setup
+#   ansible-playbook -i inventory.yml playbook.yml --tags base  # Base only
+#   ansible-playbook -i inventory.yml playbook.yml --tags security
+#   ansible-playbook -i inventory.yml playbook.yml --tags hpc
+#   ansible-playbook -i inventory.yml playbook.yml --tags dotfiles
+#
+# Author: Adam Fasulo
+
+---
+- name: Configure Security Research & HPC Development Environment
+  hosts: all
+  become: yes
+  
+  vars:
+    user_home: "{{ ansible_env.HOME }}"
+    dotfiles_repo: "{{ playbook_dir }}/.."
+    
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      tags: always
+
+  roles:
+    - role: base
+      tags: [base, all]
+    
+    - role: security-tools
+      tags: [security, all]
+    
+    - role: hpc-dev
+      tags: [hpc, all]
+    
+    - role: dotfiles
+      tags: [dotfiles, all]
+  
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg: |
+          ✅ Environment setup complete!
+          
+          Installed components:
+            - Base system utilities
+            - Security & threat hunting tools
+            - HPC development environment
+            - Shell and editor configurations
+          
+          Next steps:
+            1. Source your shell config: source ~/.bashrc
+            2. Install manual tools (Ghidra, IDA) if needed
+            3. Run 'sec-check' to verify security tools
+      tags: always
+
