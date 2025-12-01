@@ -95,10 +95,10 @@ Some tools require manual installation due to licensing or complexity:
 
 | OS | Status |
 |----|--------|
-| Ubuntu 22.04+ | ✅ Fully tested |
-| Debian 12+ | ✅ Supported |
-| RHEL/Rocky 9 | ⚠️ Partial (adjust package names) |
-| macOS | ⚠️ Dotfiles only (brew for packages) |
+| Ubuntu 22.04+ | Fully tested on homelab|
+| Debian 12+ |  Supported |
+| RHEL/Rocky 9 |  Partial (adjust package names) |
+| macOS | Dotfiles only (brew for packages) |
 
 
 
